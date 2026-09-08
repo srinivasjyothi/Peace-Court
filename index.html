@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Maintenance">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" href="icon-192.png">
+    <title>Apartment Maintenance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f9fafb;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 80px;
+        }
+        
+        input, select, textarea, button {
+            font-size: 16px !important;
+            font-family: inherit;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            color: white;
+            padding: 24px 16px;
+            padding-top: calc(24px + env(safe-area-inset-top));
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .month-selector {
+            background: white;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .month-selector label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 8px;
+        }
+        
+        .month-selector input {
+            width: 100%;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px;
+            background: white;
+        }
+        
+        .content {
+            padding: 16px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-card {
+            padding: 16px;
+            border-radius: 16px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        
+        .stat-card:active {
+            transform: scale(0.98);
+        }
+        
+        .stat-card.green {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .stat-card.red {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .stat-card.blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+        
+        .stat-card.orange {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        }
+        
+        .stat-card.purple {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+        
+        .stat-card.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .stat-detail {
+            font-size: 12px;
+            margin-top: 8px;
+            opacity: 0.9;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .action-btn {
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .action-btn.green {
+            background: #10b981;
+        }
+        
+        .action-btn.red {
+            background: #ef4444;
+        }
+        
+        .action-btn.blue {
+            background: #3b82f6;
+        }
+        
+        .item-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .item {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .item:active {
+            background: #f3f4f6;
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+        
+        .item-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        
+        .item-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .item-amount {
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-badge.paid {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-badge.pending {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status-badge.partial {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 8px;
+            padding-bottom: calc(8px + env(safe-area-inset-bottom));
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 4px;
+        }
+        
+        .nav-btn {
+            background: none;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #6b7280;
+            transition: background 0.2s;
+        }
+        
+        .nav-btn.active {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-label {
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 101;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 24px 24px 0 0;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s;
+        }
+        
+        .modal-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px;
+            border-radius: 24px 24px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: #6b7280;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .modal-body {
+            padding: 16px;
+            padding-bottom: calc(16px + env(safe-area-inset-bottom));
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px;
+            background: white;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-top: 8px;
+        }
+        
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .empty-text {
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .category-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #dbeafe;
+            color: #1e40af;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        .vendor-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #f3f4f6;
+            color: #4b5563;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        
+        .edit-btn, .delete-btn {
+            font-size: 12px;
+            font-weight: 600;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-top: 4px;
+            margin-right: 12px;
+        }
+        
+        .edit-btn {
+            color: #3b82f6;
+        }
+        
+        .delete-btn {
+            color: #ef4444;
+        }
+        
+        .item-footer {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .detail-item-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+        
+        .detail-item-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .payment-history {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .payment-item {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .payment-month {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1f2937;
+        }
+        
+        .payment-details {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+        
+        .payment-amount {
+            font-weight: bold;
+            color: #10b981;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .add-btn {
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .arrears-indicator {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #92400e;
+        }
+        
+        .advance-indicator {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #1e40af;
+        }
+        
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: #1e40af;
+        }
+        
+        .balance-card {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+        
+        .balance-label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .balance-value {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1f2937;
+        }
+        
+        .save-indicator {
+            position: fixed;
+            top: calc(10px + env(safe-area-inset-top));
+            right: 10px;
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideInRight 0.3s, fadeOut 0.3s 2.7s;
+            pointer-events: none;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <div id="saveIndicator" class="save-indicator hidden">✓ Saved</div>
+    
+    <script>
+        const START_MONTH = '2026-01';
+        
+        let state = {
+            activeTab: 'dashboard',
+            selectedMonth: START_MONTH,
+            flats: [],
+            expenditures: [],
+            modals: {
+                addFlat: false,
+                addPayment: false,
+                addExpenditure: false,
+                editExpenditure: null,
+                flatDetails: null,
+                collectionDetails: false,
+                expenditureDetails: false,
+                arrearsDetails: false
+            },
+            paymentMonthForDate: START_MONTH,
+            selectedFlatForPayment: null
+        };
+        
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.remove('hidden');
+            setTimeout(() => {
+                indicator.classList.add('hidden');
+            }, 3000);
+        }
+        
+        function loadData() {
+            try {
+                const savedFlats = localStorage.getItem('apartmentFlats');
+                const savedExpenditures = localStorage.getItem('apartmentExpenditures');
+                
+                if (savedFlats) state.flats = JSON.parse(savedFlats);
+                if (savedExpenditures) state.expenditures = JSON.parse(savedExpenditures);
+                
+                if (state.selectedMonth < START_MONTH) {
+                    state.selectedMonth = START_MONTH;
+                }
+                
+                console.log('Data loaded successfully:', {
+                    flats: state.flats.length,
+                    expenditures: state.expenditures.length
+                });
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('⚠️ Error loading saved data. Starting fresh.');
+            }
+        }
+        
+        function saveData() {
+            try {
+                localStorage.setItem('apartmentFlats', JSON.stringify(state.flats));
+                localStorage.setItem('apartmentExpenditures', JSON.stringify(state.expenditures));
+                showSaveIndicator();
+                console.log('Data saved successfully');
+            } catch (error) {
+                console.error('Error saving data:', error);
+                
+                if (error.name === 'QuotaExceededError') {
+                    alert('⚠️ Storage full! Please delete old entries or export your data.');
+                } else {
+                    alert('⚠️ Unable to save data. Please try again.');
+                }
+            }
+        }
+        
+        function calculateArrears(flat, upToMonth) {
+            if (upToMonth === START_MONTH) {
+                return flat.openingArrears || 0;
+            }
+            
+            let totalDue = 0;
+            let totalPaid = 0;
+            
+            const currentDate = new Date(upToMonth + '-01');
+            const startDate = new Date(START_MONTH + '-01');
+            
+            let checkDate = new Date(startDate);
+            while (checkDate < currentDate) {
+                totalDue += flat.monthlyFee;
+                checkDate.setMonth(checkDate.getMonth() + 1);
+            }
+            
+            totalDue += (flat.openingArrears || 0);
+            
+            flat.payments.forEach(payment => {
+                const paymentDate = new Date(payment.month + '-01');
+                if (paymentDate < currentDate && paymentDate >= startDate) {
+                    totalPaid += payment.amount;
+                }
+            });
+            
+            return totalPaid - totalDue;
+        }
+        
+        function getPaymentStatusWithBalance(flat, month) {
+            const balance = calculateArrears(flat, month);
+            const currentMonthPayment = flat.payments.find(p => p.month === month);
+            const currentMonthPaid = currentMonthPayment ? currentMonthPayment.amount : 0;
+            
+            const totalAvailable = balance + currentMonthPaid;
+            
+            if (totalAvailable >= flat.monthlyFee) {
+                return {
+                    status: 'Paid',
+                    balance: totalAvailable - flat.monthlyFee,
+                    type: totalAvailable - flat.monthlyFee > 0 ? 'advance' : 'exact'
+                };
+            } else if (currentMonthPaid > 0) {
+                return {
+                    status: 'Partial',
+                    balance: totalAvailable - flat.monthlyFee,
+                    type: 'arrears'
+                };
+            } else {
+                return {
+                    status: 'Pending',
+                    balance: totalAvailable - flat.monthlyFee,
+                    type: 'arrears'
+                };
+            }
+        }
+        
+        function getPreviousMonth(monthStr) {
+            const date = new Date(monthStr + '-01');
+            date.setMonth(date.getMonth() - 1);
+            return date.toISOString().slice(0, 7);
+        }
+        
+        function getBalanceCarriedForward(month) {
+            if (month === START_MONTH) {
+                return { cash: 0, bank: 0, total: 0 };
+            }
+            
+            const prevMonth = getPreviousMonth(month);
+            const prevStats = getMonthlyStatsForMonth(prevMonth);
+            
+            return {
+                cash: prevStats.closingCash,
+                bank: prevStats.closingBank,
+                total: prevStats.closingCash + prevStats.closingBank
+            };
+        }
+        
+        function getMonthlyStatsForMonth(month) {
+            const monthPayments = state.flats.flatMap(flat => 
+                flat.payments.filter(p => p.month === month)
+            );
+            
+            const monthExpenditures = state.expenditures.filter(exp => 
+                exp.date.slice(0, 7) === month
+            );
+            
+            const cashCollections = monthPayments.filter(p => p.method === 'Cash').reduce((sum, p) => sum + p.amount, 0);
+            const bankCollections = monthPayments.reduce((sum, p) => p.method !== 'Cash' ? sum + p.amount : sum, 0);
+            const totalCollected = cashCollections + bankCollections;
+            
+            const cashExpenditure = monthExpenditures.filter(e => e.paymentMethod === 'Cash').reduce((sum, e) => sum + e.amount, 0);
+            const bankExpenditure = monthExpenditures.reduce((sum, e) => e.paymentMethod !== 'Cash' ? sum + e.amount : sum, 0);
+            const totalExpenditure = cashExpenditure + bankExpenditure;
+            
+            const balanceCF = getBalanceCarriedForward(month);
+            
+            const closingCash = balanceCF.cash + cashCollections - cashExpenditure;
+            const closingBank = balanceCF.bank + bankCollections - bankExpenditure;
+            
+            const totalExpected = state.flats.reduce((sum, flat) => sum + flat.monthlyFee, 0);
+            
+            let paidFlats = 0;
+            let totalArrears = 0;
+            let totalAdvance = 0;
+            
+            state.flats.forEach(flat => {
+                const statusInfo = getPaymentStatusWithBalance(flat, month);
+                if (statusInfo.status === 'Paid') {
+                    paidFlats++;
+                }
+                if (statusInfo.balance < 0) {
+                    totalArrears += Math.abs(statusInfo.balance);
+                } else if (statusInfo.balance > 0) {
+                    totalAdvance += statusInfo.balance;
+                }
+            });
+            
+            return {
+                totalCollected,
+                cashCollections,
+                bankCollections,
+                totalExpenditure,
+                cashExpenditure,
+                bankExpenditure,
+                totalExpected,
+                balance: totalCollected - totalExpenditure,
+                paidFlats,
+                totalFlats: state.flats.length,
+                pendingFlats: state.flats.length - paidFlats,
+                monthPayments,
+                monthExpenditures,
+                totalArrears,
+                totalAdvance,
+                openingCash: balanceCF.cash,
+                openingBank: balanceCF.bank,
+                closingCash,
+                closingBank
+            };
+        }
+        
+        function getMonthlyStats() {
+            return getMonthlyStatsForMonth(state.selectedMonth);
+        }
+        
+        function getPaymentStatus(flat) {
+            const statusInfo = getPaymentStatusWithBalance(flat, state.selectedMonth);
+            return statusInfo.status;
+        }
+        
+        function setActiveTab(tab) {
+            state.activeTab = tab;
+            render();
+        }
+        
+        function setSelectedMonth(month) {
+            if (month >= START_MONTH) {
+                state.selectedMonth = month;
+                state.paymentMonthForDate = month;
+                render();
+            } else {
+                alert('Cannot select months before January 2026');
+                render();
+            }
+        }
+        
+        function openModal(modal) {
+            state.modals[modal] = true;
+            render();
+        }
+        
+        function closeModal(modal) {
+            state.modals[modal] = false;
+            if (modal === 'addPayment') {
+                state.selectedFlatForPayment = null;
+            }
+            render();
+        }
+        
+        function showFlatDetails(flat) {
+            state.modals.flatDetails = flat;
+            render();
+        }
+        
+        function showFlatPayment(flat) {
+            state.selectedFlatForPayment = flat;
+            state.modals.addPayment = true;
+            render();
+        }
+        
+        function openEditExpenditure(exp) {
+            state.modals.editExpenditure = exp;
+            render();
+        }
+        
+        function updatePaymentMonth(month) {
+            state.paymentMonthForDate = month;
+            render();
+        }
+        
+        function getDateRangeForMonth(monthStr) {
+            const year = parseInt(monthStr.split('-')[0]);
+            const month = parseInt(monthStr.split('-')[1]);
+            
+            const firstDay = new Date(year, month - 1, 1);
+            const lastDay = new Date(year, month, 0);
+            
+            const minDate = firstDay.toISOString().slice(0, 10);
+            const maxDate = lastDay.toISOString().slice(0, 10);
+            
+            return { minDate, maxDate };
+        }
+        
+        function addFlat(e) {
+            e.preventDefault();
+            const form = e.target;
+            const newFlat = {
+                id: Date.now(),
+                flatNumber: form.flatNumber.value,
+                ownerName: form.ownerName.value,
+                monthlyFee: parseFloat(form.monthlyFee.value),
+                phoneNumber: form.phoneNumber.value,
+                openingArrears: parseFloat(form.openingArrears.value) || 0,
+                payments: []
+            };
+            state.flats.push(newFlat);
+            saveData();
+            closeModal('addFlat');
+            form.reset();
+        }
+        
+        function recordPayment(e) {
+            e.preventDefault();
+            const form = e.target;
+            const flatId = parseInt(form.flatId.value);
+            const flat = state.flats.find(f => f.id === flatId);
+            const selectedMonth = form.month.value;
+            const paymentDate = form.date.value;
+            
+            if (selectedMonth < START_MONTH) {
+                alert('Cannot record payments before January 2026');
+                return;
+            }
+            
+            const paymentMonthFromDate = paymentDate.slice(0, 7);
+            if (paymentMonthFromDate !== selectedMonth) {
+                alert('Payment date must be within the selected month (' + selectedMonth + ')');
+                return;
+            }
+            
+            if (flat) {
+                flat.payments.push({
+                    id: Date.now(),
+                    month: selectedMonth,
+                    amount: parseFloat(form.amount.value),
+                    date: paymentDate,
+                    method: form.method.value
+                });
+                saveData();
+                closeModal('addPayment');
+                form.reset();
+                render();
+            }
+        }
+        
+        function addExpenditure(e) {
+            e.preventDefault();
+            const form = e.target;
+            const expDate = form.date.value;
+            
+            if (expDate.slice(0, 7) < START_MONTH) {
+                alert('Cannot add expenditures before January 2026');
+                return;
+            }
+            
+            const newExpenditure = {
+                id: Date.now(),
+                description: form.description.value,
+                category: form.category.value,
+                amount: parseFloat(form.amount.value),
+                date: expDate,
+                vendor: form.vendor.value,
+                paymentMethod: form.paymentMethod.value
+            };
+            state.expenditures.push(newExpenditure);
+            saveData();
+            closeModal('addExpenditure');
+            form.reset();
+            render();
+        }
+        
+        function updateExpenditure(e) {
+            e.preventDefault();
+            const form = e.target;
+            const expId = parseInt(form.expId.value);
+            const expIndex = state.expenditures.findIndex(e => e.id === expId);
+            const expDate = form.date.value;
+            
+            if (expDate.slice(0, 7) < START_MONTH) {
+                alert('Cannot set expenditure date before January 2026');
+                return;
+            }
+            
+            if (expIndex !== -1) {
+                state.expenditures[expIndex] = {
+                    ...state.expenditures[expIndex],
+                    description: form.description.value,
+                    category: form.category.value,
+                    amount: parseFloat(form.amount.value),
+                    date: expDate,
+                    vendor: form.vendor.value,
+                    paymentMethod: form.paymentMethod.value
+                };
+                saveData();
+                state.modals.editExpenditure = null;
+                render();
+            }
+        }
+        
+        function deleteFlat(id) {
+            if (confirm('Delete this flat?')) {
+                state.flats = state.flats.filter(f => f.id !== id);
+                saveData();
+                state.modals.flatDetails = null;
+                render();
+            }
+        }
+        
+        function deleteExpenditure(id) {
+            if (confirm('Delete this expenditure?')) {
+                state.expenditures = state.expenditures.filter(e => e.id !== id);
+                saveData();
+                render();
+            }
+        }
+        
+        function renderDashboard() {
+            const stats = getMonthlyStats();
+            const pendingFlats = state.flats.filter(f => getPaymentStatus(f) === 'Pending');
+            
+            return `
+                <div class="stats-grid">
+                    <div class="stat-card green" onclick="openModal('collectionDetails')">
+                        <div class="stat-label">Collected</div>
+                        <div class="stat-value">₹${(stats.totalCollected/1000).toFixed(1)}k</div>
+                        <div class="stat-detail">${stats.paidFlats}/${stats.totalFlats} paid • Cash: ₹${(stats.cashCollections/1000).toFixed(1)}k</div>
+                    </div>
+                    
+                    <div class="stat-card red" onclick="openModal('expenditureDetails')">
+                        <div class="stat-label">Spent</div>
+                        <div class="stat-value">₹${(stats.totalExpenditure/1000).toFixed(1)}k</div>
+                        <div class="stat-detail">${stats.monthExpenditures.length} items • Cash: ₹${(stats.cashExpenditure/1000).toFixed(1)}k</div>
+                    </div>
+                    
+                    ${stats.totalArrears > 0 ? `
+                    <div class="stat-card orange" onclick="openModal('arrearsDetails')">
+                        <div class="stat-label">Total Arrears</div>
+                        <div class="stat-value">₹${stats.totalArrears.toLocaleString()}</div>
+                        <div class="stat-detail">Outstanding dues</div>
+                    </div>
+                    ` : ''}
+                    
+                    ${stats.totalAdvance > 0 ? `
+                    <div class="stat-card purple">
+                        <div class="stat-label">Advance Payments</div>
+                        <div class="stat-value">₹${stats.totalAdvance.toLocaleString()}</div>
+                        <div class="stat-detail">To be adjusted</div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="stat-card ${stats.balance >= 0 ? 'blue' : 'orange'} full-width">
+                        <div class="stat-label">Balance</div>
+                        <div class="stat-value">₹${stats.balance.toLocaleString()}</div>
+                        <div class="stat-detail">Cash: ₹${stats.closingCash.toLocaleString()} • Bank: ₹${stats.closingBank.toLocaleString()}</div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Cash & Bank Balance</div>
+                    <div class="balance-card">
+                        <div class="balance-row" style="border-bottom: 1px solid #e5e7eb;">
+                            <span class="balance-label">Opening Cash</span>
+                            <span class="balance-value">₹${stats.openingCash.toLocaleString()}</span>
+                        </div>
+                        <div class="balance-row" style="border-bottom: 1px solid #e5e7eb;">
+                            <span class="balance-label">Cash Collected</span>
+                            <span class="balance-value" style="color: #10b981;">+₹${stats.cashCollections.toLocaleString()}</span>
+                        </div>
+                        <div class="balance-row" style="border-bottom: 1px solid #e5e7eb;">
+                            <span class="balance-label">Cash Spent</span>
+                            <span class="balance-value" style="color: #ef4444;">-₹${stats.cashExpenditure.toLocaleString()}</span>
+                        </div>
+                        <div class="balance-row" style="border-bottom: 2px solid #1f2937;">
+                            <span class="balance-label" style="font-weight: 600;">Closing Cash</span>
+                            <span class="balance-value" style="font-size: 18px; color: #10b981;">₹${stats.closingCash.toLocaleString()}</span>
+                        </div>
+                        
+                        <div class="balance-row" style="border-bottom: 1px solid #e5e7eb; margin-top: 12px;">
+                            <span class="balance-label">Opening Bank</span>
+                            <span class="balance-value">₹${stats.openingBank.toLocaleString()}</span>
+                        </div>
+                        <div class="balance-row" style="border-bottom: 1px solid #e5e7eb;">
+                            <span class="balance-label">Bank Collections</span>
+                            <span class="balance-value" style="color: #10b981;">+₹${stats.bankCollections.toLocaleString()}</span>
+                        </div>
+                        <div class="balance-row" style="border-bottom: 1px solid #e5e7eb;">
+                            <span class="balance-label">Bank Payments</span>
+                            <span class="balance-value" style="color: #ef4444;">-₹${stats.bankExpenditure.toLocaleString()}</span>
+                        </div>
+                        <div class="balance-row">
+                            <span class="balance-label" style="font-weight: 600;">Closing Bank</span>
+                            <span class="balance-value" style="font-size: 18px; color: #3b82f6;">₹${stats.closingBank.toLocaleString()}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Quick Actions</div>
+                    <div class="quick-actions">
+                        <button class="action-btn green" onclick="openModal('addPayment')">💰 Add Payment</button>
+                        <button class="action-btn red" onclick="openModal('addExpenditure')">💸 Add Expense</button>
+                    </div>
+                </div>
+                
+                ${stats.pendingFlats > 0 ? `
+                <div class="section">
+                    <div class="section-title">Pending Payments (${stats.pendingFlats})</div>
+                    <div class="item-list">
+                        ${pendingFlats.map(flat => {
+                            const statusInfo = getPaymentStatusWithBalance(flat, state.selectedMonth);
+                            return `
+                            <div class="item" onclick='showFlatPayment(${JSON.stringify(flat).replace(/'/g, "&apos;")})'>
+                                <div class="item-header">
+                                    <div>
+                                        <div class="item-title">${flat.flatNumber}</div>
+                                        <div class="item-subtitle">${flat.ownerName}</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div class="item-amount" style="color: #ef4444;">₹${flat.monthlyFee}</div>
+                                        <div style="font-size: 12px; color: #6b7280;">Tap to pay</div>
+                                    </div>
+                                </div>
+                                ${statusInfo.balance < 0 ? `
+                                <div class="arrears-indicator">
+                                    Arrears: ₹${Math.abs(statusInfo.balance).toLocaleString()}
+                                </div>
+                                ` : ''}
+                            </div>
+                        `}).join('')}
+                    </div>
+                </div>
+                ` : ''}
+            `;
+        }
+        
+        function renderFlats() {
+            return `
+                <div class="section-header">
+                    <div class="section-title">All Flats (${state.flats.length})</div>
+                    <button class="add-btn" onclick="openModal('addFlat')">+ Add Flat</button>
+                </div>
+                
+                ${state.flats.length === 0 ? `
+                    <div class="section">
+                        <div class="empty-state">
+                            <div class="empty-icon">🏢</div>
+                            <div class="empty-text">No flats added yet</div>
+                            <button class="action-btn blue" onclick="openModal('addFlat')">Add Your First Flat</button>
+                        </div>
+                    </div>
+                ` : `
+                    ${state.flats.map(flat => {
+                        const status = getPaymentStatus(flat);
+                        const statusInfo = getPaymentStatusWithBalance(flat, state.selectedMonth);
+                        const statusClass = status === 'Paid' ? 'paid' : status === 'Partial' ? 'partial' : 'pending';
+                        return `
+                            <div class="section" onclick='showFlatPayment(${JSON.stringify(flat).replace(/'/g, "&apos;")})'>
+                                <div class="item-header">
+                                    <div>
+                                        <div class="item-title" style="font-size: 18px;">${flat.flatNumber}</div>
+                                        <div class="item-subtitle">${flat.ownerName}</div>
+                                    </div>
+                                    <span class="status-badge ${statusClass}">${status}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                                    <div style="font-size: 14px; color: #6b7280;">Monthly Fee</div>
+                                    <div style="font-size: 18px; font-weight: bold; color: #1f2937;">₹${flat.monthlyFee}</div>
+                                </div>
+                                ${flat.openingArrears && flat.openingArrears !== 0 ? `
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb;">
+                                    <div style="font-size: 12px; color: #6b7280;">Opening Arrears (Jan 2026)</div>
+                                    <div style="font-size: 14px; font-weight: bold; color: ${flat.openingArrears < 0 ? '#f59e0b' : '#3b82f6'};">₹${Math.abs(flat.openingArrears).toLocaleString()}</div>
+                                </div>
+                                ` : ''}
+                                ${statusInfo.balance < 0 ? `
+                                <div class="arrears-indicator">
+                                    Current Arrears: ₹${Math.abs(statusInfo.balance).toLocaleString()}
+                                </div>
+                                ` : statusInfo.balance > 0 ? `
+                                <div class="advance-indicator">
+                                    Advance: ₹${statusInfo.balance.toLocaleString()} (adjusts next months)
+                                </div>
+                                ` : ''}
+                                <div style="text-align: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                                    <div style="font-size: 12px; color: #3b82f6; font-weight: 600;">Tap to record payment</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                `}
+            `;
+        }
+        
+        function renderExpenses() {
+            const stats = getMonthlyStats();
+            const categoryTotals = stats.monthExpenditures.reduce((acc, exp) => {
+                acc[exp.category] = (acc[exp.category] || 0) + exp.amount;
+                return acc;
+            }, {});
+            
+            return `
+                <div class="section-header">
+                    <div class="section-title">Expenses</div>
+                    <button class="add-btn" onclick="openModal('addExpenditure')">+ Add Expense</button>
+                </div>
+                
+                <div class="section">
+                    <div style="font-weight: bold; color: #1f2937; margin-bottom: 12px;">This Month</div>
+                    ${Object.keys(categoryTotals).length > 0 ? `
+                        ${Object.entries(categoryTotals).map(([category, amount]) => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 14px; color: #6b7280;">${category}</span>
+                                <span style="font-weight: 600; color: #1f2937;">₹${amount.toLocaleString()}</span>
+                            </div>
+                        `).join('')}
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid #e5e7eb; font-weight: bold;">
+                            <span style="color: #1f2937;">Total</span>
+                            <span style="color: #ef4444;">₹${stats.totalExpenditure.toLocaleString()}</span>
+                        </div>
+                    ` : '<div style="color: #9ca3af; font-size: 14px;">No expenses this month</div>'}
+                </div>
+                
+                ${state.expenditures
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .map(exp => `
+                    <div class="section">
+                        <div class="item-header">
+                            <div style="flex: 1;">
+                                <div class="item-title">${exp.description}</div>
+                                <div class="item-subtitle">${new Date(exp.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                            </div>
+                            <div style="text-align: right; margin-left: 16px;">
+                                <div style="font-weight: bold; color: #ef4444;">₹${exp.amount}</div>
+                                <div style="margin-top: 4px;">
+                                    <button class="edit-btn" onclick='event.stopPropagation(); openEditExpenditure(${JSON.stringify(exp).replace(/'/g, "&apos;")})'>Edit</button>
+                                    <button class="delete-btn" onclick="event.stopPropagation(); deleteExpenditure(${exp.id})">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-footer">
+                            <span class="category-tag">${exp.category}</span>
+                            ${exp.vendor ? `<span class="vendor-tag">${exp.vendor}</span>` : ''}
+                            ${exp.paymentMethod ? `<span class="vendor-tag">${exp.paymentMethod}</span>` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+        
+        function render() {
+            const app = document.getElementById('app');
+            
+            let content = '';
+            if (state.activeTab === 'dashboard') content = renderDashboard();
+            else if (state.activeTab === 'flats') content = renderFlats();
+            else if (state.activeTab === 'expenses') content = renderExpenses();
+            
+            const monthDisplay = new Date(state.selectedMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            
+            app.innerHTML = `
+                <div class="header">
+                    <h1>Maintenance Manager</h1>
+                    <p>Track fees & expenses (From Jan 2026)</p>
+                </div>
+                
+                <div class="month-selector">
+                    <label>Select Month (From ${START_MONTH})</label>
+                    <input type="month" value="${state.selectedMonth}" min="${START_MONTH}" onchange="setSelectedMonth(this.value)">
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">Viewing: ${monthDisplay}</div>
+                </div>
+                
+                <div class="content">
+                    ${content}
+                </div>
+                
+                <div class="bottom-nav">
+                    <button class="nav-btn ${state.activeTab === 'dashboard' ? 'active' : ''}" onclick="setActiveTab('dashboard')">
+                        <div class="nav-icon">📊</div>
+                        <div class="nav-label">Dashboard</div>
+                    </button>
+                    <button class="nav-btn ${state.activeTab === 'flats' ? 'active' : ''}" onclick="setActiveTab('flats')">
+                        <div class="nav-icon">🏢</div>
+                        <div class="nav-label">Flats</div>
+                    </button>
+                    <button class="nav-btn ${state.activeTab === 'expenses' ? 'active' : ''}" onclick="setActiveTab('expenses')">
+                        <div class="nav-icon">💸</div>
+                        <div class="nav-label">Expenses</div>
+                    </button>
+                </div>
+                
+                ${renderModals()}
+            `;
+        }
+        
+        function renderModals() {
+            const stats = getMonthlyStats();
+            const dateRange = getDateRangeForMonth(state.paymentMonthForDate);
+            
+            return `
+                ${state.modals.collectionDetails ? `
+                    <div class="modal-overlay" onclick="closeModal('collectionDetails')"></div>
+                    <div class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="modal-title">Collection Details</div>
+                                <button class="close-btn" onclick="closeModal('collectionDetails')">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="balance-card">
+                                    <div class="balance-row">
+                                        <span class="balance-label">Total Collected</span>
+                                        <span class="balance-value">₹${stats.totalCollected.toLocaleString()}</span>
+                                    </div>
+                                    <div class="balance-row">
+                                        <span class="balance-label">Cash Collections</span>
+                                        <span class="balance-value" style="color: #10b981;">₹${stats.cashCollections.toLocaleString()}</span>
+                                    </div>
+                                    <div class="balance-row">
+                                        <span class="balance-label">Bank Collections</span>
+                                        <span class="balance-value" style="color: #3b82f6;">₹${stats.bankCollections.toLocaleString()}</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: 20px;">
+                                    <div style="font-weight: bold; color: #1f2937; margin-bottom: 12px;">Payments Received</div>
+                                    ${stats.monthPayments.length > 0 ? `
+                                        <div class="item-list">
+                                            ${stats.monthPayments.map(payment => {
+                                                const flat = state.flats.find(f => f.payments.some(p => p.id === payment.id));
+                                                return `
+                                                    <div class="item">
+                                                        <div class="item-header">
+                                                            <div>
+                                                                <div class="item-title">${flat ? flat.flatNumber + ' - ' + flat.ownerName : 'Unknown'}</div>
+                                                                <div class="item-subtitle">${new Date(payment.date).toLocaleDateString()} • ${payment.method}</div>
+                                                            </div>
+                                                            <div class="item-amount" style="color: #10b981;">₹${payment.amount.toLocaleString()}</div>
+                                                        </div>
+                                                    </div>
+                                                `;
+                                            }).join('')}
+                                        </div>
+                                    ` : '<div style="color: #9ca3af; text-align: center; padding: 20px;">No payments received this month</div>'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${state.modals.expenditureDetails ? `
+                    <div class="modal-overlay" onclick="closeModal('expenditureDetails')"></div>
+                    <div class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="modal-title">Expenditure Details</div>
+                                <button class="close-btn" onclick="closeModal('expenditureDetails')">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="balance-card">
+                                    <div class="balance-row">
+                                        <span class="balance-label">Total Spent</span>
+                                        <span class="balance-value">₹${stats.totalExpenditure.toLocaleString()}</span>
+                                    </div>
+                                    <div class="balance-row">
+                                        <span class="balance-label">Cash Payments</span>
+                                        <span class="balance-value" style="color: #ef4444;">₹${stats.cashExpenditure.toLocaleString()}</span>
+                                    </div>
+                                    <div class="balance-row">
+                                        <span class="balance-label">Bank Payments</span>
+                                        <span class="balance-value" style="color: #ef4444;">₹${stats.bankExpenditure.toLocaleString()}</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: 20px;">
+                                    <div style="font-weight: bold; color: #1f2937; margin-bottom: 12px;">All Expenses</div>
+                                    ${stats.monthExpenditures.length > 0 ? `
+                                        <div class="item-list">
+                                            ${stats.monthExpenditures.map(exp => `
+                                                <div class="item">
+                                                    <div class="item-header">
+                                                        <div>
+                                                            <div class="item-title">${exp.description}</div>
+                                                            <div class="item-subtitle">${exp.category} • ${new Date(exp.date).toLocaleDateString()} • ${exp.paymentMethod}</div>
+                                                        </div>
+                                                        <div class="item-amount" style="color: #ef4444;">₹${exp.amount.toLocaleString()}</div>
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    ` : '<div style="color: #9ca3af; text-align: center; padding: 20px;">No expenses this month</div>'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${state.modals.arrearsDetails ? `
+                    <div class="modal-overlay" onclick="closeModal('arrearsDetails')"></div>
+                    <div class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="modal-title">Arrears Details</div>
+                                <button class="close-btn" onclick="closeModal('arrearsDetails')">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div style="font-weight: bold; color: #1f2937; margin-bottom: 12px;">Flats with Arrears</div>
+                                <div class="item-list">
+                                    ${state.flats.filter(flat => {
+                                        const statusInfo = getPaymentStatusWithBalance(flat, state.selectedMonth);
+                                        return statusInfo.balance < 0;
+                                    }).map(flat => {
+                                        const statusInfo = getPaymentStatusWithBalance(flat, state.selectedMonth);
+                                        return `
+                                            <div class="item">
+                                                <div class="item-header">
+                                                    <div>
+                                                        <div class="item-title">${flat.flatNumber} - ${flat.ownerName}</div>
+                                                        <div class="item-subtitle">Monthly Fee: ₹${flat.monthlyFee}</div>
+                                                    </div>
+                                                    <div class="item-amount" style="color: #f59e0b;">₹${Math.abs(statusInfo.balance).toLocaleString()}</div>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                                <div class="balance-card" style="margin-top: 20px;">
+                                    <div class="balance-row">
+                                        <span class="balance-label" style="font-weight: bold;">Total Arrears</span>
+                                        <span class="balance-value" style="color: #f59e0b; font-size: 20px;">₹${stats.totalArrears.toLocaleString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${state.modals.addFlat ? `
+                    <div class="modal-overlay" onclick="closeModal('addFlat')"></div>
+                    <div class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="modal-title">Add New Flat</div>
+                                <button class="close-btn" onclick="closeModal('addFlat')">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="info-box">
+                                    💡 Enter opening arrears/advance as on January 2026. Use negative for arrears (e.g., -5000) and positive for advance (e.g., 5000).
+                                </div>
+                                <form onsubmit="addFlat(event)">
+                                    <div class="form-group">
+                                        <label class="form-label">Flat Number *</label>
+                                        <input type="text" name="flatNumber" class="form-input" placeholder="e.g., A-101" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Owner Name *</label>
+                                        <input type="text" name="ownerName" class="form-input" placeholder="Enter owner name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Monthly Fee (₹) *</label>
+                                        <input type="number" name="monthlyFee" class="form-input" placeholder="e.g., 2000" step="0.01" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Phone Number</label>
+                                        <input type="tel" name="phoneNumber" class="form-input" placeholder="Enter phone number">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Opening Arrears as on Jan 2026 (₹)</label>
+                                        <input type="number" name="openingArrears" class="form-input" placeholder="-5000 for arrears or +5000 for advance" step="0.01">
+                                        <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+                                            Negative = Arrears (dues) | Positive = Advance payment | Leave blank if none
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="submit-btn blue">Add Flat</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${state.modals.addPayment ? `
+                    <div class="modal-overlay" onclick="closeModal('addPayment')"></div>
+                    <div class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="modal-title">Record Payment</div>
+                                <button class="close-btn" onclick="closeModal('addPayment')">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="info-box">
+                                    💡 Payment date must be within the selected month
+                                </div>
+                                <form onsubmit="recordPayment(event)">
+                                    <div class="form-group">
+                                        <label class="form-label">Select Flat *</label>
+                                        <select name="flatId" class="form-select" required>
+                                            ${state.selectedFlatForPayment ? `
+                                                <option value="${state.selectedFlatForPayment.id}" selected>${state.selectedFlatForPayment.flatNumber} - ${state.selectedFlatForPayment.ownerName}</option>
+                                            ` : '<option value="">Choose a flat</option>'}
+                                            ${state.flats.filter(f => !state.selectedFlatForPayment || f.id !== state.selectedFlatForPayment.id).map(flat => {
+                                                const statusInfo = getPaymentStatusWithBalance(flat, state.selectedMonth);
+                                                let balanceText = '';
+                                                if (statusInfo.balance < 0) {
+                                                    balanceText = ` [Arrears: ₹${Math.abs(statusInfo.balance).toLocaleString()}]`;
+                                                } else if (statusInfo.balance > 0) {
+                                                    balanceText = ` [Advance: ₹${statusInfo.balance.toLocaleString()}]`;
+                                                }
+                                                return `<option value="${flat.id}">${flat.flatNumber} - ${flat.ownerName} (₹${flat.monthlyFee})${balanceText}</option>`;
+                                            }).join('')}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Month * (From Jan 2026)</label>
+                                        <input type="month" name="month" class="form-input" value="${state.selectedMonth}" min="${START_MONTH}" onchange="updatePaymentMonth(this.value)" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Payment Date * (Must be in selected month)</label>
+                                        <input type="date" name="date" class="form-input" 
+                                               min="${dateRange.minDate}" 
+                                               max="${dateRange.maxDate}" 
+                                               value="${dateRange.minDate}" required>
+                                        <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+                                            Allowed: ${dateRange.minDate} to ${dateRange.maxDate}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Amount Paid (₹) *</label>
+                                        <input type="number" name="amount" class="form-input" placeholder="Enter amount" step="0.01" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Payment Method *</label>
+                                        <select name="method" class="form-select">
+                                            <option>Cash</option>
+                                            <option>UPI</option>
+                                            <option>Bank Transfer</option>
+                                            <option>Cheque</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="submit-btn green">Record Payment</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${state.modals.addExpenditure ? `
+                    <div class="modal-overlay" onclick="closeModal('addExpenditure')"></div>
+                    <div class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="modal-title">Add Expenditure</div>
+                                <button class="close-btn" onclick="closeModal('addExpenditure')">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <form onsubmit="addExpenditure(event)">
+                                    <div class="form-group">
+                                        <label class="form-label">Description *</label>
+                                        <input type="text" name="description" class="form-input" placeholder="e.g., Monthly cleaning service" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Category *</label>
+                                        <select name="category" class="form-select">
+                                            <option>Cleaning</option>
+                                            <option>Security</option>
+                                            <option>Repairs</option>
+                                            <option>Electricity</option>
+                                            <option>Water</option>
+                                            <option>Gardening</option>
+                                            <option>Lift Maintenance</option>
+                                            <option>Pest Control</option>
+                                            <option>Others</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Amount (₹) *</label>
+                                        <input type="number" name="amount" class="form-input" placeholder="Enter amount" step="0.01" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Date * (From Jan 2026)</label>
+                                        <input type="date" name="date" class="form-input" value="${new Date().toISOString().slice(0, 10)}" min="2026-01-01" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Vendor/Service Provider</label>
+                                        <input type="text" name="vendor" class="form-input" placeholder="Enter vendor name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Payment Method *</label>
+                                        <select name="paymentMethod" class="form-select">
+                                            <option>Cash</option>
+                                            <option>UPI</option>
+                                            <option>Bank Transfer</option>
+                                            <option>Cheque</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="submit-btn red">Add Expenditure</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${state.modals.editExpenditure ? `
+                    <div class="modal-overlay" onclick="state.modals.editExpenditure = null; render();"></div>
+                    <div class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="modal-title">Edit Expenditure</div>
+                                <button class="close-btn" onclick="state.modals.editExpenditure = null; render();">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <form onsubmit="updateExpenditure(event)">
+                                    <input type="hidden" name="expId" value="${state.modals.editExpenditure.id}">
+                                    <div class="form-group">
+                                        <label class="form-label">Description *</label>
+                                        <input type="text" name="description" class="form-input" value="${state.modals.editExpenditure.description}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Category *</label>
+                                        <select name="category" class="form-select">
+                                            <option ${state.modals.editExpenditure.category === 'Cleaning' ? 'selected' : ''}>Cleaning</option>
+                                            <option ${state.modals.editExpenditure.category === 'Security' ? 'selected' : ''}>Security</option>
+                                            <option ${state.modals.editExpenditure.category === 'Repairs' ? 'selected' : ''}>Repairs</option>
+                                            <option ${state.modals.editExpenditure.category === 'Electricity' ? 'selected' : ''}>Electricity</option>
+                                            <option ${state.modals.editExpenditure.category === 'Water' ? 'selected' : ''}>Water</option>
+                                            <option ${state.modals.editExpenditure.category === 'Gardening' ? 'selected' : ''}>Gardening</option>
+                                            <option ${state.modals.editExpenditure.category === 'Lift Maintenance' ? 'selected' : ''}>Lift Maintenance</option>
+                                            <option ${state.modals.editExpenditure.category === 'Pest Control' ? 'selected' : ''}>Pest Control</option>
+                                            <option ${state.modals.editExpenditure.category === 'Others' ? 'selected' : ''}>Others</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Amount (₹) *</label>
+                                        <input type="number" name="amount" class="form-input" value="${state.modals.editExpenditure.amount}" step="0.01" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Date * (From Jan 2026)</label>
+                                        <input type="date" name="date" class="form-input" value="${state.modals.editExpenditure.date}" min="2026-01-01" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Vendor/Service Provider</label>
+                                        <input type="text" name="vendor" class="form-input" value="${state.modals.editExpenditure.vendor || ''}" placeholder="Enter vendor name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Payment Method *</label>
+                                        <select name="paymentMethod" class="form-select">
+                                            <option ${(state.modals.editExpenditure.paymentMethod === 'Cash' || !state.modals.editExpenditure.paymentMethod) ? 'selected' : ''}>Cash</option>
+                                            <option ${state.modals.editExpenditure.paymentMethod === 'UPI' ? 'selected' : ''}>UPI</option>
+                                            <option ${state.modals.editExpenditure.paymentMethod === 'Bank Transfer' ? 'selected' : ''}>Bank Transfer</option>
+                                            <option ${state.modals.editExpenditure.paymentMethod === 'Cheque' ? 'selected' : ''}>Cheque</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="submit-btn blue">Update Expenditure</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+        }
+        
+        loadData();
+        render();
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js').catch((err) => {
+                    console.error('Service worker registration failed:', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
