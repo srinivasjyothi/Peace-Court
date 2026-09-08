@@ -1,7 +1,7 @@
 {
-  "name": "Apartment Maintenance Manager",
+  "name": "Apartment Maintenance Tracker",
   "short_name": "Maintenance",
-  "description": "Track flat maintenance fees, payments, and expenses",
+  "description": "Track flat maintenance fees, payments, bank transactions, and expenses",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
