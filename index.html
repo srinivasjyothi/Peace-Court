@@ -533,11 +533,15 @@
     <div id="saveIndicator" class="save-indicator hidden">✓ Saved</div>
     
     <script>
-        const START_MONTH = '2026-01';
+        const START_MONTH = '2026-09';
+        const CURRENT_MONTH = (() => {
+            const now = new Date().toISOString().slice(0, 7);
+            return now < START_MONTH ? START_MONTH : now;
+        })();
         
         let state = {
             activeTab: 'dashboard',
-            selectedMonth: START_MONTH,
+            selectedMonth: CURRENT_MONTH,
             flats: [],
             expenditures: [],
             bankTransactions: [],
@@ -563,7 +567,7 @@
                 addCashBankTransfer: false,
                 extraCharge: false
             },
-            paymentMonthForDate: START_MONTH,
+            paymentMonthForDate: CURRENT_MONTH,
             selectedFlatForPayment: null,
             suggestedPaymentAmount: 0
         };
@@ -814,7 +818,7 @@
                 state.paymentMonthForDate = month;
                 render();
             } else {
-                alert('Cannot select months before January 2026');
+                alert('Cannot select months before September 2026');
             }
         }
         
@@ -994,7 +998,7 @@
             
             // Validation 1: Cannot record payments before START_MONTH
             if (selectedMonth < START_MONTH) {
-                alert('Cannot record payments before January 2026');
+                alert('Cannot record payments before September 2026');
                 return;
             }
             
@@ -1042,7 +1046,7 @@
             const expDate = form.date.value;
             
             if (expDate.slice(0, 7) < START_MONTH) {
-                alert('Cannot add expenditures before January 2026');
+                alert('Cannot add expenditures before September 2026');
                 return;
             }
             
@@ -1069,7 +1073,7 @@
             const expDate = form.date.value;
             
             if (expDate.slice(0, 7) < START_MONTH) {
-                alert('Cannot set date before January 2026');
+                alert('Cannot set date before September 2026');
                 return;
             }
             
@@ -1102,7 +1106,7 @@
             const txnDate = form.date.value;
             
             if (txnDate.slice(0, 7) < START_MONTH) {
-                alert('Cannot add transactions before January 2026');
+                alert('Cannot add transactions before September 2026');
                 return;
             }
             
@@ -1133,7 +1137,7 @@
             const txnDate = form.date.value;
             
             if (txnDate.slice(0, 7) < START_MONTH) {
-                alert('Cannot add transfers before January 2026');
+                alert('Cannot add transfers before September 2026');
                 return;
             }
             
@@ -1898,10 +1902,10 @@
             if (state.modals.openingBalances) {
                 html += `<div class="modal-overlay" onclick="closeModal('openingBalances')"></div>
                 <div class="modal"><div class="modal-content"><div class="modal-header">
-                <div class="modal-title">Opening Balances (Jan 2026)</div>
+                <div class="modal-title">Opening Balances (Sep 2026)</div>
                 <button class="close-btn" onclick="closeModal('openingBalances')">×</button>
                 </div><div class="modal-body">
-                <div class="info-box">💡 Set the cash and bank balances as of January 1, 2026</div>
+                <div class="info-box">💡 Set the cash and bank balances as of September 1, 2026</div>
                 <form onsubmit="setOpeningBalances(event)">
                     <div class="form-group"><label class="form-label">Opening Cash Balance (₹)</label>
                     <input type="number" name="openingCash" class="form-input" value="${state.openingBalances.cash}" step="0.01" required></div>
@@ -2029,7 +2033,7 @@
                     <input type="number" name="monthlyFee" class="form-input" step="0.01" required></div>
                     <div class="form-group"><label class="form-label">Phone</label>
                     <input type="tel" name="phoneNumber" class="form-input"></div>
-                    <div class="form-group"><label class="form-label">Opening Balance (Jan 2026)</label>
+                    <div class="form-group"><label class="form-label">Opening Balance (Sep 2026)</label>
                     <input type="number" name="openingArrears" class="form-input" placeholder="-5000 or +5000" step="0.01"></div>
                     <button type="submit" class="submit-btn blue">Add Flat</button>
                 </form></div></div></div>`;
@@ -2053,7 +2057,7 @@
                     <input type="number" name="monthlyFee" class="form-input" value="${flat.monthlyFee}" step="0.01" required></div>
                     <div class="form-group"><label class="form-label">Phone</label>
                     <input type="tel" name="phoneNumber" class="form-input" value="${flat.phoneNumber || ''}"></div>
-                    <div class="form-group"><label class="form-label">Opening Balance (Jan 2026)</label>
+                    <div class="form-group"><label class="form-label">Opening Balance (Sep 2026)</label>
                     <input type="number" name="openingArrears" class="form-input" value="${flat.openingArrears || 0}" step="0.01"></div>
                     <button type="submit" class="submit-btn blue">Update Flat</button>
                     <button type="button" class="submit-btn red" style="margin-top: 8px;" onclick="deleteFlat(${flat.id})">Delete Flat</button>
@@ -2109,7 +2113,7 @@
                     <div class="form-group"><label class="form-label">Amount (₹) *</label>
                     <input type="number" name="amount" class="form-input" step="0.01" required></div>
                     <div class="form-group"><label class="form-label">Date *</label>
-                    <input type="date" name="date" class="form-input" value="${getTodayDateString()}" min="2026-01-01" required></div>
+                    <input type="date" name="date" class="form-input" value="${getTodayDateString()}" min="2026-09-01" required></div>
                     <div class="form-group"><label class="form-label">Vendor</label>
                     <input type="text" name="vendor" class="form-input"></div>
                     <div class="form-group"><label class="form-label">Payment Method *</label>
@@ -2139,7 +2143,7 @@
                     <div class="form-group"><label class="form-label">Amount (₹) *</label>
                     <input type="number" name="amount" class="form-input" step="0.01" required></div>
                     <div class="form-group"><label class="form-label">Date *</label>
-                    <input type="date" name="date" class="form-input" value="${getTodayDateString()}" min="2026-01-01" required></div>
+                    <input type="date" name="date" class="form-input" value="${getTodayDateString()}" min="2026-09-01" required></div>
                     <button type="submit" class="submit-btn" style="background: #8b5cf6;">Add Transaction</button>
                 </form>
                 ${state.bankTransactions.length > 0 ? `
@@ -2184,7 +2188,7 @@
                     <div class="form-group"><label class="form-label">Amount (₹) *</label>
                     <input type="number" name="amount" class="form-input" step="0.01" required></div>
                     <div class="form-group"><label class="form-label">Date *</label>
-                    <input type="date" name="date" class="form-input" value="${getTodayDateString()}" min="2026-01-01" required></div>
+                    <input type="date" name="date" class="form-input" value="${getTodayDateString()}" min="2026-09-01" required></div>
                     <button type="submit" class="submit-btn" style="background: #f59e0b;">Add Transfer</button>
                 </form>
                 ${state.cashBankTransfers.length > 0 ? `
@@ -2270,7 +2274,7 @@
                     <div class="form-group"><label class="form-label">Amount (₹) *</label>
                     <input type="number" name="amount" class="form-input" value="${exp.amount}" step="0.01" required></div>
                     <div class="form-group"><label class="form-label">Date *</label>
-                    <input type="date" name="date" class="form-input" value="${exp.date}" min="2026-01-01" required></div>
+                    <input type="date" name="date" class="form-input" value="${exp.date}" min="2026-09-01" required></div>
                     <div class="form-group"><label class="form-label">Vendor</label>
                     <input type="text" name="vendor" class="form-input" value="${exp.vendor || ''}"></div>
                     <div class="form-group"><label class="form-label">Payment Method *</label>
