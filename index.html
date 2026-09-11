@@ -579,8 +579,11 @@
                 extraCharges: state.extraCharges,
                 openingBalances: state.openingBalances,
                 updatedAt: new Date().toISOString()
+            }).then(() => {
+                showSaveIndicator('✓ Saved & Synced', '#10b981');
             }).catch((error) => {
-                console.error('Cloud save failed (will retry when back online):', error);
+                console.error('Cloud save failed:', error);
+                showSaveIndicator('⚠️ Saved locally — cloud sync failed', '#ef4444', 6000);
             });
         }
 
@@ -591,20 +594,27 @@
                 if (doc.exists) {
                     const data = doc.data();
                     receivingCloudUpdate = true;
-                    state.flats = data.flats || [];
-                    state.expenditures = data.expenditures || [];
-                    state.bankTransactions = data.bankTransactions || [];
-                    state.cashBankTransfers = data.cashBankTransfers || [];
-                    state.extraCharges = data.extraCharges || {};
-                    state.openingBalances = data.openingBalances || { cash: 0, bank: 0 };
-                    localStorage.setItem('apartmentFlats', JSON.stringify(state.flats));
-                    localStorage.setItem('apartmentExpenditures', JSON.stringify(state.expenditures));
-                    localStorage.setItem('bankTransactions', JSON.stringify(state.bankTransactions));
-                    localStorage.setItem('cashBankTransfers', JSON.stringify(state.cashBankTransfers));
-                    localStorage.setItem('extraCharges', JSON.stringify(state.extraCharges));
-                    localStorage.setItem('openingBalances', JSON.stringify(state.openingBalances));
-                    receivingCloudUpdate = false;
-                    render();
+                    try {
+                        state.flats = data.flats || [];
+                        state.expenditures = data.expenditures || [];
+                        state.bankTransactions = data.bankTransactions || [];
+                        state.cashBankTransfers = data.cashBankTransfers || [];
+                        state.extraCharges = data.extraCharges || {};
+                        state.openingBalances = data.openingBalances || { cash: 0, bank: 0 };
+                        localStorage.setItem('apartmentFlats', JSON.stringify(state.flats));
+                        localStorage.setItem('apartmentExpenditures', JSON.stringify(state.expenditures));
+                        localStorage.setItem('bankTransactions', JSON.stringify(state.bankTransactions));
+                        localStorage.setItem('cashBankTransfers', JSON.stringify(state.cashBankTransfers));
+                        localStorage.setItem('extraCharges', JSON.stringify(state.extraCharges));
+                        localStorage.setItem('openingBalances', JSON.stringify(state.openingBalances));
+                        render();
+                    } catch (err) {
+                        console.error('Error applying cloud update:', err);
+                        showSaveIndicator('⚠️ Cloud update error', '#ef4444', 6000);
+                    } finally {
+                        // Always reset, even if something above threw, so saves never get silently stuck
+                        receivingCloudUpdate = false;
+                    }
                 } else if (firstSnapshot && state.flats.length > 0) {
                     // First run on this device with existing local data but no cloud copy yet: seed the cloud
                     pushToCloud();
@@ -612,6 +622,7 @@
                 firstSnapshot = false;
             }, (error) => {
                 console.error('Cloud sync error:', error);
+                showSaveIndicator('⚠️ Cloud connection error', '#ef4444', 6000);
             });
         }
         // ---- End cloud sync ----
@@ -649,10 +660,13 @@
             suggestedPaymentAmount: 0
         };
         
-        function showSaveIndicator() {
+        function showSaveIndicator(text, color, duration) {
             const indicator = document.getElementById('saveIndicator');
+            indicator.textContent = text || '✓ Saved';
+            indicator.style.background = color || '#10b981';
             indicator.classList.remove('hidden');
-            setTimeout(() => indicator.classList.add('hidden'), 3000);
+            clearTimeout(window._saveIndicatorTimeout);
+            window._saveIndicatorTimeout = setTimeout(() => indicator.classList.add('hidden'), duration || 3000);
         }
         
         function loadData() {
